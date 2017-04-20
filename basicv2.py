@@ -2,7 +2,7 @@ import serial
 import math
 import matplotlib.pyplot as plt
 
-"""
+#"""
 ser = serial.Serial(
     port='COM3', \
     baudrate=9600, \
@@ -12,7 +12,7 @@ ser = serial.Serial(
     )
 
 print("connected to: " + ser.portstr)
-""" # uncomment this
+#""" # uncomment this
 
 area = 0
 perimeter = 0
@@ -39,10 +39,10 @@ while True:
 
     #-------------Get input from the sensor-----------------------
 
-    #s = ser.readline() # uncomment this
+    s = ser.readline() # uncomment this
 
-    test = ("b'1000,%d\r\n" %i) #for testing
-    s = test # for testing
+    #test = ("b'1000,%d\r\n" %i) #for testing
+    #s = test # for testing
     r_str, degree_str = (str(s).replace("\\", "").replace("rn", "").replace("b", "").replace("'", "").split(','))
 
     if r_str == "off" or degree_str == "off":
@@ -50,31 +50,33 @@ while True:
         continue
 
     r = int(r_str)/10
-    degree = int(degree_str)/10
+    degree = int(degree_str)
 
-    i=i+14 # for testing
+    #i=i+14 # for testing
 
     #--------------Writing data to text file-----------------------
-    if float(degree) < 360 or i < 258:
-        data1.write("%.1f %.1f\n" %(r, degree))
-        print("1st: r = %.1f cm  degree = %.1f" % (r, degree))
-        if float(degree) >= 359:
-            print("2nd scanning")
+    if float(degree) < 3600:
+        data1.write("%.1f %.1f\n" %(r, degree/10))
+        print("1st: r = %.1f cm  degree = %.1f" % (r, degree/10))
+        if float(degree) >= 3590:
+            print("Ending CW at %.1f" %(degree/10))
             data1.close()
-    elif float(degree) <= 721:
-        if float(degree) <= 359.8:
-            continue
-        degree2 = 361-degree
-        degree_ini = degree2 + 360
-        data2.write("%.1f %.1f\n" % (r, degree_ini))
-        print("2nd: r = %.1f cm  degree = %.1f" % (r, degree_ini))
-    if float(degree) >= 720:
+    elif float(degree) <= 7224:
+        if float(degree) <= 3612:
+            print("Starting CCW at %.1f" %(degree/10))#361.2
+            print("2nd scanning")
+            continue#362.8+x = -1.4
+        degree2 = 3624 - degree
+        degree_ini = degree2 + 3600
+        data2.write("%.1f %.1f\n" % (r, degree_ini/10))
+        print("2nd: r = %.1f cm  degree = %.1f" % (r, degree_ini/10))
+    if float(degree) >= 7224:
         print("---Complete Scanning---")
         data2.close()
         break
         #-----------------------------------------------------------------
 
-#ser.close() # uncomment this
+ser.close() # uncomment this
 
 #-------------Data comparation-------------------
 data1 = open("data1.txt", "r")
@@ -89,14 +91,14 @@ for line in reversed(data2.readlines()):
         x_f = round(float(r_f)*math.cos(math.pi/180*(float(d1))),3)
         y_f = round(float(r_f)*math.sin(math.pi/180*(float(d1))),3)
         data3.write("%.3f %.3f\n" % (x_f, y_f))
-    elif(float(d1) < float(d2)):
-        x_f0 = round(float(r1)*math.cos(math.pi/180*(float(d1))),3)
-        y_f0 = round(float(r1)*math.sin(math.pi/180*(float(d1))),3)
+    elif(float(d1) > float(d2)):
+        x_f0 = round(float(r2)*math.cos(math.pi/180*(float(d2))),3)
+        y_f0 = round(float(r2)*math.sin(math.pi/180*(float(d2))),3)
         data3.write("%.3f %.3f\n" % (x_f0, y_f0))
         print("missing some data at %.1f from data1.txt" & d1)
-    elif(float(d1) > float(d2)):
-        x_f0 = round(float(r2)*math.cos(math.pi/180*(float(d1))),3)
-        y_f0 = round(float(r2)*math.sin(math.pi/180*(float(d1))),3)
+    else:
+        x_f0 = round(float(r1)*math.cos(math.pi/180*(float(d1))),3)
+        y_f0 = round(float(r1)*math.sin(math.pi/180*(float(d1))),3)
         data3.write("%.3f %.3f\n" % (x_f0, y_f0))
         print("missing some data at %.1f from data2.txt" & d2)
 
