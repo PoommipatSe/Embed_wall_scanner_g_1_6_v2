@@ -89,9 +89,16 @@ for line in reversed(data2.readlines()):
         x_f = round(float(r_f)*math.cos(math.pi/180*(float(d1))),3)
         y_f = round(float(r_f)*math.sin(math.pi/180*(float(d1))),3)
         data3.write("%.3f %.3f\n" % (x_f, y_f))
-    else:
-        print("missing some data at %.1f or %.1f" & (d1, d2))
-        continue
+    elif(float(d1) < float(d2)):
+        x_f0 = round(float(r1)*math.cos(math.pi/180*(float(d1))),3)
+        y_f0 = round(float(r1)*math.sin(math.pi/180*(float(d1))),3)
+        data3.write("%.3f %.3f\n" % (x_f0, y_f0))
+        print("missing some data at %.1f from data1.txt" & d1)
+    elif(float(d1) > float(d2)):
+        x_f0 = round(float(r2)*math.cos(math.pi/180*(float(d1))),3)
+        y_f0 = round(float(r2)*math.sin(math.pi/180*(float(d1))),3)
+        data3.write("%.3f %.3f\n" % (x_f0, y_f0))
+        print("missing some data at %.1f from data2.txt" & d2)
 
 data1.close()
 data2.close()
@@ -130,7 +137,7 @@ data3.close()
 finalArea = (round(0.5*area, 3))
 finalPerimeter = (round(perimeter, 3))
 
-textArea = 'Area    \u2248 %.3f $cm^2$' % (finalArea)
+textArea = 'Area    \u2248 %.3f cm\u00b2' % (finalArea)
 textPerimeter = 'Perimeter  \u2248 %.3f cm' % (finalPerimeter)
 
 print(textArea)
